@@ -1,6 +1,6 @@
 Welcome to my Bug Hunting repository! 👋
 
-My name is Sahil Sunil, and I am an aspiring cybersecurity researcher and bug hunter passionate about uncovering vulnerabilities and contributing to a safer digital world. This repository serves as a collection of my bug bounty journey, tools, scripts, and writeups that showcase my skills and experiences in identifying and reporting security flaws.
+My name is Sahil aka HyperVenom29, and I am an aspiring cybersecurity researcher and bug hunter passionate about uncovering vulnerabilities and contributing to a safer digital world. This repository serves as a collection of my bug bounty journey, tools, scripts, and writeups that showcase my skills and experiences in identifying and reporting security flaws.
 
 What You'll Find Here
 Writeups: Detailed reports of bugs I’ve discovered (after responsible disclosure).
